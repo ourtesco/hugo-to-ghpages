@@ -20,3 +20,22 @@ steps:
 
 - script: 'sudo dpkg -i hugo_$(hugo.version)_Linux-64bit.deb'
   displayName: 'Install HUGO'
+
+- script: |
+   cd $(blog.path)
+   hugo  --log -v
+  displayName: 'Generate Blog'
+
+- task: CopyFiles@2
+  displayName: 'Copy Blog'
+  inputs:
+    SourceFolder: '$(blog.path)/public'
+    Contents: '**'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Blog'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
